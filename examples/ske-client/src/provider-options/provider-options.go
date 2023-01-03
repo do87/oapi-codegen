@@ -13,6 +13,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	skeclient "github.com/do87/oapi-codegen/examples/ske-client"
 )
 
@@ -289,14 +291,14 @@ func (c *ClientWithResponses) ParseGetProviderOptionsResponse(rsp *http.Response
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest ProviderOptions
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest RuntimeError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
 		response.JSONDefault = &dest
 
